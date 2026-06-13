@@ -65,5 +65,7 @@ create table Asegurado
 create table ObjetoAsegurado
 (
 	id_Obejto bigint identity(1,1) primary key,
-	descripcion Varchar(1200)
+	descripcion Varchar(1200),
+	poliza_id bigint,
+	Foreign Key (poliza_id) references	Poliza(id_Poliza)
 );

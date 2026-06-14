@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "sqlserver"
+  //url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id_Usuario Int      @id(map: "PK__Usuario__8E901EAAE4210F7C") @default(autoincrement())
+  usuario    String?  @unique(map: "UQ__Usuario__9AFF8FC6B3E1372B") @db.VarChar(25)
+  pass       String?  @db.VarChar(250)
+  estado     Int?
+  persona_id Int?
+  persona    Persona? @relation(fields: [persona_id], references: [id_Persona], onDelete: NoAction, onUpdate: NoAction, map: "FK__Usuario__persona__5629CD9C")
+}
+
+model Persona {
+  id_Persona Int         @id(map: "PK__Persona__214BF527429DAC5B") @default(autoincrement())
+  nombre     String?     @db.VarChar(500)
+  apellido   String?     @db.VarChar(500)
+  dni        String?     @unique(map: "UQ__Persona__D87608A73D5C567F") @db.VarChar(500)
+  telefono   Int?
+  estado     Int?
+  Asegurado  Asegurado[]
+  Poliza     Poliza[]
+  usuarios   Usuario[]
+}
+
+model Asegurado {
+  asegurado_id Int
+  poliza_id    BigInt
+  Persona      Persona @relation(fields: [asegurado_id], references: [id_Persona], onUpdate: NoAction, map: "FK__Asegurado__asegu__5EBF139D")
+  Poliza       Poliza  @relation(fields: [poliza_id], references: [id_Poliza], onUpdate: NoAction, map: "FK__Asegurado__poliz__5FB337D6")
+
+  @@id([asegurado_id, poliza_id], map: "PK__Asegurad__72D075C7EF69A772")
+}
+
+model Cobertura {
+  id_Cobertura Int      @id(map: "PK__Cobertur__2F6780277D905D25") @default(autoincrement())
+  descripcion  String?  @unique(map: "UQ__Cobertur__298336B6A01ECDE1") @db.VarChar(500)
+  Poliza       Poliza[]
+}
+
+model Compa_ia {
+  id_Compar_ia Int      @id(map: "PK__Compañia__E80DAF82BE4B41DD") @default(autoincrement()) @map("id_Comparñia")
+  descripcion  String?  @unique(map: "UQ__Compañia__298336B65C268FC2") @db.VarChar(150)
+  Poliza       Poliza[]
+
+  @@map("Compañia")
+}
+
+model ObjetoAsegurado {
+  id_Obejto   BigInt  @id(map: "PK__ObjetoAs__453AFB3E72D85551") @default(autoincrement())
+  descripcion String? @db.VarChar(1200)
+  poliza_id   BigInt?
+  Poliza      Poliza? @relation(fields: [poliza_id], references: [id_Poliza], onDelete: NoAction, onUpdate: NoAction, map: "FK__ObjetoAse__poliz__6FE99F9F")
+}
+
+model Origen {
+  id_Origen   Int      @id(map: "PK__Origen__6CCE5BE91A086260") @default(autoincrement())
+  descripcion String?  @unique(map: "UQ__Origen__298336B60A161E20") @db.VarChar(250)
+  Poliza      Poliza[]
+}
+
+model Poliza {
+  id_Poliza       BigInt            @id(map: "PK__Poliza__1D744E9F75C36E4B") @default(autoincrement())
+  codigo          String            @db.VarChar(1000)
+  descripcion     String            @db.VarChar(1000)
+  fechaRegistro   DateTime?         @db.DateTime
+  fechaInicio     DateTime?         @db.DateTime
+  fechaFin        DateTime?         @db.DateTime
+  estado          Int?
+  personaRegistra Int?
+  compa_ia_id     Int?              @map("compañia_id")
+  origen_id       Int?
+  cobertura_id    Int?
+  Asegurado       Asegurado[]
+  ObjetoAsegurado ObjetoAsegurado[]
+  Cobertura       Cobertura?        @relation(fields: [cobertura_id], references: [id_Cobertura], onDelete: NoAction, onUpdate: NoAction, map: "FK__Poliza__cobertur__5BE2A6F2")
+  Compa_ia        Compa_ia?         @relation(fields: [compa_ia_id], references: [id_Compar_ia], onDelete: NoAction, onUpdate: NoAction, map: "FK__Poliza__compañia__59FA5E80")
+  Origen          Origen?           @relation(fields: [origen_id], references: [id_Origen], onDelete: NoAction, onUpdate: NoAction, map: "FK__Poliza__origen_i__5AEE82B9")
+  Persona         Persona?          @relation(fields: [personaRegistra], references: [id_Persona], onDelete: NoAction, onUpdate: NoAction, map: "FK__Poliza__personaR__59063A47")
+}

@@ -69,3 +69,13 @@ create table ObjetoAsegurado
 	poliza_id bigint,
 	Foreign Key (poliza_id) references	Poliza(id_Poliza)
 );
+
+create table Estado
+(
+	id int primary key,
+	descripcion varchar(25)
+);
+
+Insert Into Estado Values(0,'Deshabilitado');
+Insert Into Estado Values(1,'Habilitado');
+Insert Into Estado Values(2,'Admin');
